@@ -1,0 +1,107 @@
+*{padding: 0;margin: 0;}
+
+/* body, #app {
+	width: 100%;
+	height: 100vh;
+} */
+
+/* .frame-container {
+    height: 100vh;
+    width: 100%;
+} */
+
+#map {
+	width: 100%;
+	height: 100vh;
+}
+
+.left-div {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	z-index: 5;
+	display: flex;
+}
+
+.el-autocomplete-suggestion li {
+	padding: 0 10px;
+	font-size: 14px;
+	line-height: 14px
+}
+
+.el-autocomplete-suggestion li:last-child>div:nth-child(3) {
+	margin-bottom: 0;
+}
+
+.el-autocomplete-suggestion li:last-child>div:nth-child(4) {
+	display: none;
+}
+
+.mb10 {
+	margin-bottom: 10px;
+}
+
+.el-input__inner {
+	color: #333333 !important;
+}
+
+.questionList {
+	box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
+	border-radius: 4px;
+	border: 1px solid #e4e7ed;
+	background-color: #FFFFFF;
+	width: 275px;
+	color: #333333;
+	font-size: 14px;
+	position: absolute;
+	top: 66px;
+	left: 20px;
+	transform-origin: center top;
+	max-height: 600px;
+	overflow: auto;
+	z-index: 5;
+}
+
+.questionItem {
+	line-height: 14px;
+	cursor: pointer;
+}
+
+.item-content {
+	padding: 10px 0;
+	margin: 0 10px;
+	border-bottom: 1px dashed #EDECEC;
+}
+
+.questionList>div:last-child>div {
+	border: none;
+}
+
+.questionItem:hover,
+.itemSelect {
+	background-color: #F6F6F6;
+}
+
+.item-id {
+	display: flex;
+	height: 20px;
+	line-height: 20px;
+	margin-bottom: 8px;
+}
+
+.id-icon {
+	width: 20px;
+	height: 20px;
+	background-image: url(../img/id.png);
+}
+
+.id-value {
+	width: 100%;
+	padding-left: 4px;
+	overflow: hidden;
+	/*内容会被修剪，并且其余内容是不可见的*/
+	text-overflow: ellipsis;
+	/*显示省略符号来代表被修剪的文本。*/
+	white-space: nowrap;
+	/*文本不换行*/
+}

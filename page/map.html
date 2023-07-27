@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script type="text/javascript" src="../js/jquery-3.6.0.min.js"></script>
+		<script type="text/javascript" src="../js/vue/vue-2.7.10.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/element/element-ui-2.15.10.js" charset="utf-8"></script>
+		<script type="text/javascript"
+			src="http://api.map.baidu.com/api?v=3.0&type=webgl&ak=gbp4EHxVLGDbDB3OFMBi3p9sMHZle4HT"></script>
+		<script type="text/javascript" src="../js/baiduMap/MarkerClusterer_min.js"></script>
+		<script type="text/javascript" src="../js/baiduMap/TextIconOverlay_min.js"></script>
+		<link rel="stylesheet" href="../css/base.css">
+	</head>
+	<body>
+		<div id="app" class="frame-container" v-cloak>
+			<div id="map"></div>
+			<div class="left-div">
+				<el-input placeholder="请输入内容" v-model="keyWord" @change="searchChange"
+					style="width: 275px; color: #333333">
+					<i slot="suffix" @click="searchChange" class="el-input__icon el-icon-search"
+						style="cursor: pointer"></i>
+				</el-input>
+			</div>
+			<div v-if="questionList.length > 0" class="questionList">
+				<div class="questionItem" :class="item.select ? 'itemSelect' : ''" v-for="item in questionList"
+					@click="itemClick(item)">
+					<div class="item-content">
+						<div class="mb10">位置：{{ item.name }}</div>
+						<div class="mb10">经度：{{ item.longitude }}</div>
+						<div>纬度：{{ item.latitude }}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script type="application/javascript">
+		let map = null;
+		let markerClusterer = null;
+		let lng = '116.169625';
+		let lat = '34.196174';
+
+		new Vue({
+			el: "#app",
+			data: function() {
+				return {
+					keyWord: '',
+					questionList: [],
+					questionAllList: [{
+						"id": 1,
+						"name": "位置1",
+						"latitude": 39.07354684038222,
+						"longitude": 115.9424516604042
+					}, ]
+				}
+			},
+			created() {
+				this.$nextTick(() => {
+					this.initMap();
+					this.getBoundary('江苏省南通市崇川区');
+					this.questionList = this.questionAllList
+					this.setMarker(this.questionAllList)
+				})
+
+			},
+			mounted() {},
+			watch: {},
+			methods: {
+				//初始化地图
+				initMap() {
+					map = new BMapGL.Map("map");
+					map.enableScrollWheelZoom(true);
+					map.setMapType(BMAP_HYBRID_MAP);
+					map.centerAndZoom(new BMapGL.Point(lng, lat), 12);
+				},
+				getBoundary(name) {
+					var bdary = new BMapGL.Boundary();
+					bdary.get(name, function(rs) { //获取行政区域
+						//  map.clearOverlays();        //清除地图覆盖物
+						var count = rs.boundaries.length; //行政区域的点有多少个
+						for (var i = 0; i < count; i++) {
+							var ply = new BMapGL.Polygon(rs.boundaries[i], {
+								enableMassClear: false,
+								strokeWeight: 3,
+								strokeStyle: "dashed",
+								strokeColor: "#3872F7",
+								fillColor: "#3872F7",
+								fillOpacity: 0.1
+							}); //建立多边形覆盖物
+							map.addOverlay(ply); //添加覆盖物
+							map.setViewport(ply.getPath()); //调整视野
+						}
+					});
+				},
+				searchChange() {
+
+				},
+				itemClick(e) {
+					let list = this.questionAllList;
+					list.forEach(o => {
+						o.select = e.id === o.id
+					});
+					this.questionList = [];
+					this.questionList = list;
+				},
+				setMarker(list) {
+					let _this = this;
+					map.clearOverlays();
+					let markerList = [];
+					$.each(list, (index, marker) => {
+						let new_point = new BMapGL.Point(marker.longitude, marker.latitude);
+						//获取详情的图标
+						let imgUrl = "../img/ditu.png";
+						let myIcon = new BMapGL.Icon(imgUrl, new BMapGL.Size(27, 40));
+						let richMarker = new BMapGL.Marker(new_point, {
+							icon: myIcon
+						});
+						richMarker.id = marker.id
+						richMarker.setTop(true);
+						map.addOverlay(richMarker);
+						markerList.push(richMarker)
+						richMarker.addEventListener("click", function(e) {
+							//此处添加marker点击事件
+							_this.questionList = [];
+							_this.questionList.push(marker);
+							_this.showQuestion(_this.questionList);
+						});
+					})
+					markerClusterer = new BMapGLLib.MarkerClusterer(map, {
+						markers: markerList,
+						styles: [{
+							url: "/img/ditu-1.png", //点聚合图标背景图（我这边用了自己聚合点的样式，不传入就是默认样式
+							size: new BMapGL.Size(44, 55), //点聚合图标大小
+							textSize: '14px',
+							textColor: '#FF0000',
+							textOffset: new BMapGL.Size(10, 20),
+							lineHeight: '45'
+						}],
+						onClusterClick: markers => {
+							_this.showQuestion(markers)
+						}
+					});
+
+				},
+			}
+		});
+	</script>
+</html>

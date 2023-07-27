@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script type="text/javascript" src="../js/vue/vue-2.7.10.js" charset="utf-8"></script>
+		<style>
+			* {
+				width: 100%;
+				height: 100%;
+				padding: 0;
+				margin: 0;
+			}
+
+			body {
+				position: relative;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body id="app">
+		<iframe :src="url" frameborder='0'>
+	</body>
+
+	<script>
+		new Vue({
+			el: "#app",
+			data: function() {
+				return {
+					url: 'page/map.html'
+				}
+			},
+			created() {},
+			mounted() {},
+			watch: {},
+			methods: {
+
+			},
+		})
+	</script>
+</html>
