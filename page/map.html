@@ -17,10 +17,18 @@
 			<div id="map"></div>
 			<div class="left-div">
 				<el-input placeholder="请输入内容" v-model="keyWord" @change="searchChange"
-					style="width: 275px; color: #333333">
+					style="width: 275px; color: #333333;margin-right: 10px;">
 					<i slot="suffix" @click="searchChange" class="el-input__icon el-icon-search"
 						style="cursor: pointer"></i>
 				</el-input>
+				<el-dropdown @command="commandChange">
+				  <el-button type="primary">
+				      更多菜单<i class="el-icon-arrow-down el-icon--right"></i>
+				    </el-button>
+				  <el-dropdown-menu slot="dropdown">
+				    <el-dropdown-item v-for="item in mapTypes" :command="item.value">{{ item.name }}</el-dropdown-item>
+				  </el-dropdown-menu>
+				</el-dropdown>
 			</div>
 			<div v-if="questionList.length > 0" class="questionList">
 				<div class="questionItem" :class="item.select ? 'itemSelect' : ''" v-for="item in questionList"
@@ -51,7 +59,22 @@
 						"name": "位置1",
 						"latitude": 39.07354684038222,
 						"longitude": 115.9424516604042
-					}, ]
+					}, ],
+					mapTypes: [{
+								name: '卫星路网混合视图',
+								value: BMAP_HYBRID_MAP
+							},{
+								name: '标准地图',
+								value: BMAP_NORMAL_MAP
+							},
+							{
+								name: '地球模式',
+								value: BMAP_EARTH_MAP
+							},
+							{
+								name: '普通卫星地图',
+								value: BMAP_SATELLITE_MAP
+							}]
 				}
 			},
 			created() {
@@ -66,6 +89,10 @@
 			mounted() {},
 			watch: {},
 			methods: {
+				commandChange(command) {
+					console.log(command == BMAP_HYBRID_MAP)
+					map.setMapType(command);
+				},
 				//初始化地图
 				initMap() {
 					map = new BMapGL.Map("map");
