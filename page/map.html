@@ -7,7 +7,7 @@
 		<script type="text/javascript" src="../js/vue/vue-2.7.10.js" charset="utf-8"></script>
 		<script type="text/javascript" src="../js/element/element-ui-2.15.10.js" charset="utf-8"></script>
 		<script type="text/javascript"
-			src="https://api.map.baidu.com/api?v=3.0&type=webgl&ak=gbp4EHxVLGDbDB3OFMBi3p9sMHZle4HT"></script>
+			src="https://api.map.baidu.com/api?v=3.0&type=webgl&ak=Iy0pAxxEznnGZYB0XeKyCAV81KPjqQXe"></script>
 		<script type="text/javascript" src="../js/baiduMap/MarkerClusterer_min.js"></script>
 		<script type="text/javascript" src="../js/baiduMap/TextIconOverlay_min.js"></script>
 		<link rel="stylesheet" href="../css/base.css">
@@ -16,21 +16,23 @@
 		<div id="app" class="frame-container" v-cloak>
 			<div id="map"></div>
 			<div class="left-div">
-				<el-input placeholder="请输入内容" v-model="keyWord" @change="searchChange"
-					style="width: 275px; color: #333333;margin-right: 10px;">
-					<i slot="suffix" @click="searchChange" class="el-input__icon el-icon-search"
-						style="cursor: pointer"></i>
+				<el-input placeholder="请输入内容" id="keyWord" v-model="keyWord"
+					style="width: 275px; color: #333333;margin-right: 10px;"
+					@change="searchTextChange" @clear="searchChange" clearable>
+					<!-- <i slot="suffix" @click="searchChange" class="el-input__icon el-icon-search"
+						style="cursor: pointer"></i> -->
 				</el-input>
 				<el-dropdown @command="commandChange">
-				  <el-button type="primary">
-				      更多菜单<i class="el-icon-arrow-down el-icon--right"></i>
-				    </el-button>
-				  <el-dropdown-menu slot="dropdown">
-				    <el-dropdown-item v-for="item in mapTypes" :command="item.value">{{ item.name }}</el-dropdown-item>
-				  </el-dropdown-menu>
+					<el-button type="primary">
+						更多菜单<i class="el-icon-arrow-down el-icon--right"></i>
+					</el-button>
+					<el-dropdown-menu slot="dropdown">
+						<el-dropdown-item v-for="item in mapTypes"
+							:command="item.value">{{ item.name }}</el-dropdown-item>
+					</el-dropdown-menu>
 				</el-dropdown>
 			</div>
-			<div v-if="questionList.length > 0" class="questionList">
+			<!-- <div v-if="questionList.length > 0" class="questionList">
 				<div class="questionItem" :class="item.select ? 'itemSelect' : ''" v-for="item in questionList"
 					@click="itemClick(item)">
 					<div class="item-content">
@@ -39,14 +41,14 @@
 						<div>纬度：{{ item.latitude }}</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 		</div>
 	</body>
 	<script type="application/javascript">
 		let map = null;
 		let markerClusterer = null;
-		let lng = '116.169625';
-		let lat = '34.196174';
+		let lng = '120.901068';
+		let lat = '31.986888';
 
 		new Vue({
 			el: "#app",
@@ -57,30 +59,31 @@
 					questionAllList: [{
 						"id": 1,
 						"name": "位置1",
-						"latitude": 39.07354684038222,
-						"longitude": 115.9424516604042
+						"latitude": 31.986888,
+						"longitude": 120.901068
 					}, ],
 					mapTypes: [{
-								name: '卫星路网混合视图',
-								value: BMAP_HYBRID_MAP
-							},{
-								name: '标准地图',
-								value: BMAP_NORMAL_MAP
-							},
-							{
-								name: '地球模式',
-								value: BMAP_EARTH_MAP
-							},
-							{
-								name: '普通卫星地图',
-								value: BMAP_SATELLITE_MAP
-							}]
+							name: '卫星路网混合视图',
+							value: BMAP_HYBRID_MAP
+						}, {
+							name: '标准地图',
+							value: BMAP_NORMAL_MAP
+						},
+						{
+							name: '地球模式',
+							value: BMAP_EARTH_MAP
+						},
+						{
+							name: '普通卫星地图',
+							value: BMAP_SATELLITE_MAP
+						}
+					]
 				}
 			},
 			created() {
 				this.$nextTick(() => {
 					this.initMap();
-					this.getBoundary('江苏省南通市崇川区');
+					// this.getBoundary('江苏省南通市崇川区');
 					this.questionList = this.questionAllList
 					this.setMarker(this.questionAllList)
 				})
@@ -99,6 +102,73 @@
 					map.enableScrollWheelZoom(true);
 					map.setMapType(BMAP_HYBRID_MAP);
 					map.centerAndZoom(new BMapGL.Point(lng, lat), 12);
+					this.location()
+					
+					var ac = new BMapGL.Autocomplete({    //建立一个自动完成的对象
+					                    "input": "searchText"
+					                    , "location": this.map
+					                });
+					
+					                ac.addEventListener("onhighlight", function (e) {  //鼠标放在下拉列表上的事件
+					                    // console.log(e)
+					                });
+					
+					                ac.addEventListener("onconfirm", function (e) {    //鼠标点击下拉列表后的事件
+					                    //鼠标点击下拉列表后的事件
+					                    var _value = e.item.value;
+					                    var addressInfo = {}
+					                    addressInfo.address =
+					                        _value.province +
+					                        _value.city +
+					                        _value.district +
+					                        _value.street +
+					                        _value.business;
+					                    // 搜索
+					                    map.clearOverlays(); //清除地图上所有覆盖物
+					                    //智能搜索
+					                    var local = new BMapGL.LocalSearch(map, {
+					                        onSearchComplete: () => {
+					                            //获取第一个智能搜索的结果
+					                            const pp = local.getResults().getPoi(0).point;
+					                            map.centerAndZoom(pp, 12);
+					                            let marker = new BMapGL.Marker(pp);
+					                            let label = new BMapGL.Label(addressInfo.address, {offset: new BMapGL.Size(0, -55)})
+					                            marker.setLabel(label);
+					                            label.setStyle({
+					                                // background: '#ffffff',
+					                                background: "rbga(255,255,255,0.9)",
+					                                opacity: "0.9",
+					                                border: "1px solid #409EFF",
+					                                borderRadius: "4px",
+					                                color: "#000",
+					                                fontSize: '14px',
+					                                height: "24px",
+					                                lineHeight: "24px",
+					                                transform: 'translateX(-50%)',
+					                                textAlign: 'center',
+					                                padding: '0 10px',
+					                                maxWidth: '500px',
+					                            })
+					                            map.addOverlay(marker); //添加标注
+					                            // console.log(pp.lng)
+					                            // console.log(pp.lat)
+					                        },
+					                    });
+					                    local.search(addressInfo.address);
+					                });
+				},
+				location() {
+					let geolocation = new BMapGL.Geolocation();
+					geolocation.getCurrentPosition(function(r) {
+						if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+							var mk = new BMapGL.Marker(r.point);
+							// map.addOverlay(mk);
+							map.panTo(r.point);
+							map.centerAndZoom(new BMapGL.Point(r.point.lng, r.point.lat), 12);
+						} else {
+							alert('failed' + this.getStatus());
+						}
+					});
 				},
 				getBoundary(name) {
 					var bdary = new BMapGL.Boundary();
