@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="../js/vue/vue-2.7.10.js"></script>
+		<script src="../js/vue-baidu-map.js"></script>
+		<style>
+			body, #app, .map {
+				width: 100vw;
+				height: 100vh;
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<baidu-map
+				class="map"
+				:center="center"
+				:zoom="14"
+				:scroll-wheel-zoom="true">
+				<bm-polygon
+					:path="polygonPath"
+					stroke-color="#1570d6"
+					fill-color="rgba(149,200,187,0.8)"
+					:stroke-weight="4"
+					:editing="false">
+				</bm-polygon>
+			</baidu-map>
+		</div>
+	</body>
+	<script>
+		// https://dafrok.github.io/vue-baidu-map/#/zh/index
+		Vue.use(VueBaiduMap.default, {
+			// ak: "${baiduMap_ak}"
+		})
+		new Vue({
+			el: '#app',
+			data: {
+				center: {lng: 116.404, lat: 39.915},
+				polygonPath: [
+					{lng: 116.412732, lat: 39.911707},
+					{lng: 116.39455, lat: 39.910932},
+					{lng: 116.403461, lat: 39.921336}
+				],
+			},
+			mounted() {
+				
+			},
+			methods: {
+			}
+		})
+	</script>
+</html>
